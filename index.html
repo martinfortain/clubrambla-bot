@@ -62,29 +62,49 @@
 </div>
 <script>
 const WORKER_URL = 'https://rox-bot.martinfortain.workers.dev';
- 
-const SYS = `Sos el asistente virtual de Club Rambla, un gimnasio ubicado en Av. 19 N° 481, La Plata. Respondés de forma amigable, breve y directa, como si fueras una persona real del equipo. Usás español rioplatense (vos, tenés, etc). Máximo un emoji por mensaje y solo cuando suma. Sin listas con viñetas. Párrafos cortos y conversacionales.
- 
-DIRECCIÓN: Av. 19 N° 481, La Plata
+
+const SYS = `Sos el asistente virtual de Club Rambla, un gimnasio premium ubicado en Av. 19 N° 481 entre 41 y 42, La Plata. Respondés de forma amigable, breve y directa, como si fueras una persona real del equipo. Usás español rioplatense (vos, tenés, etc). Máximo un emoji por mensaje y solo cuando suma. Sin listas con viñetas. Párrafos cortos y conversacionales.
+
+DIRECCIÓN: Av. 19 N° 481 entre 41 y 42, La Plata
 TELÉFONO: 0221 696-0048
 INSTAGRAM: @clubrambla
- 
+
 HORARIOS:
-- Lunes a viernes: 6 AM a 12 AM (medianoche)
+- Lunes a viernes: 6:00 a 00:00 
 - Sábados: 8:00 a 22:00
 - Domingos: 16:00 a 22:00
- 
+
 PLANES Y PRECIOS:
-- Plan Básico: $60.000/mes. Incluye acceso total al gimnasio, rutina personalizada y seguimiento por profes.
+- Plan Básico: $60.000/mes. Incluye acceso total al gimnasio, rutina semi-personalizada y seguimiento por profes.
 - Plan VIP: $70.000/mes. Incluye todo lo del Básico más consulta con nutricionista, 2 estudios corporales Visbody y 10% OFF en viandas saludables.
- 
+
 ACTIVIDADES:
 - Musculación
 - Circuito aeróbico
 - Gym localizada
-- Zumba
 - Entrenamiento funcional
- 
+- Entrenamiento deportivo en espacio outdoor de césped sintético
+
+EQUIPAMIENTO (todo marca G-Fitness, nuevo):
+- Cintas y bicicletas fijas
+- Remo y Ski Hyrox
+- Trineos
+- Poleas dobles
+- Jaulas Smith
+- Power Racks
+- Rampa y escalera para entrenamiento funcional
+- Espacio outdoor de césped sintético
+
+INSTALACIONES Y SERVICIOS:
+- Vestuarios con duchas
+- Lockers
+- Escáner corporal 3D Visbody (mapeo de composición y postura corporal)
+- Consultorio de Nutrición
+- Consultorio kinesiológico
+- Cafetería y viandas saludables
+- Espacio de Coworking con WiFi
+- App exclusiva del gimnasio
+
 PROMOS VIGENTES:
 - Beneficio Rambla
 - Plan de referidos
@@ -92,16 +112,15 @@ PROMOS VIGENTES:
 - Promos bancarias
 - Descuento en efectivo
 (Para conocer los detalles de cada promo, indicales que se acerquen al gym o contacten por Instagram @clubrambla)
- 
-ENTRENAMIENTO PERSONALIZADO:
-- Sí, ofrecen rutinas personalizadas con sus profes. Para más info invitalos a acercarse al gym.
- 
-Si alguien pregunta algo que no sabés o quiere más detalles, deciles que contacten por Instagram @clubrambla o que llamen al 0221 696-0048. Nunca inventes información.`;
- 
+
+Si alguien pregunta por las máquinas, mencioná que son todas nuevas marca G-Fitness.
+Si alguien pregunta algo que no sabés o quiere más detalles, deciles que contacten por Instagram @clubrambla o que llamen al 0221 696-0048.
+Nunca inventes información.`;
+
 let hist = [], busy = false;
- 
-const INIT_QRS = ["¿Cuáles son los horarios?","¿Cuánto sale la cuota?","¿Qué planes tienen?","¿Tienen entrenamiento personalizado?"];
- 
+
+const INIT_QRS = ["¿Cuáles son los horarios?","¿Cuánto sale la cuota?","¿Qué servicios tienen?","¿Tienen entrenamiento personalizado?"];
+
 function addMsg(role, text) {
   const m = document.getElementById('msgs');
   const row = document.createElement('div');
@@ -114,7 +133,7 @@ function addMsg(role, text) {
   m.appendChild(row);
   m.scrollTop = m.scrollHeight;
 }
- 
+
 function showTyp() {
   const m = document.getElementById('msgs');
   const row = document.createElement('div'); row.className='rbot'; row.id='trow';
@@ -122,14 +141,14 @@ function showTyp() {
   const t = document.createElement('div'); t.className='typ'; t.innerHTML='<span></span><span></span><span></span>'; row.appendChild(t);
   m.appendChild(row); m.scrollTop=m.scrollHeight;
 }
- 
+
 function hideTyp() { const t=document.getElementById('trow'); if(t) t.remove(); }
- 
+
 function setQRs(list) {
   const c = document.getElementById('qrs'); c.innerHTML='';
   list.forEach(r => { const b=document.createElement('button'); b.className='qr'; b.textContent=r; b.onclick=()=>sendText(r); c.appendChild(b); });
 }
- 
+
 async function sendText(text) {
   if (busy || !text.trim()) return;
   busy = true;
@@ -149,7 +168,7 @@ async function sendText(text) {
     hist.push({role:'assistant', content:reply});
     hideTyp();
     addMsg('bot', reply);
-    if (hist.length <= 4) setQRs(["¿Qué incluye el plan VIP?","¿Tienen promos?","¿Abren los domingos?","¿Cómo me anoto?"]);
+    if (hist.length <= 4) setQRs(["¿Qué incluye el plan VIP?","¿Tienen promos?","¿Qué máquinas tienen?","¿Tienen kinesiólogo?"]);
   } catch(e) {
     hideTyp();
     addMsg('bot', 'Hubo un error de conexión. Intentá de nuevo.');
@@ -157,12 +176,12 @@ async function sendText(text) {
   busy = false;
   document.getElementById('sbtn').disabled = false;
 }
- 
+
 function doSend() { const i=document.getElementById('inp'); const t=i.value.trim(); i.value=''; i.style.height='auto'; sendText(t); }
- 
+
 document.getElementById('inp').addEventListener('input', function() { this.style.height='auto'; this.style.height=Math.min(this.scrollHeight,120)+'px'; });
 document.getElementById('inp').addEventListener('keydown', function(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();doSend();} });
- 
+
 async function init() {
   busy = true; showTyp();
   await new Promise(r => setTimeout(r, 700));
@@ -177,4 +196,3 @@ init();
 </script>
 </body>
 </html>
- 
