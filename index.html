@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Club Rambla — Atención</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: #0f0f0f; color: #e8e8f0; font-family: 'Segoe UI', sans-serif; }
+  .shell { display: flex; flex-direction: column; height: 100vh; max-width: 480px; margin: 0 auto; border-left: 1px solid #2a2a2a; border-right: 1px solid #2a2a2a; }
+  .hdr { display: flex; align-items: center; gap: 12px; padding: 14px 18px; background: #1a1a1a; border-bottom: 1px solid #2a2a2a; flex-shrink: 0; }
+  .av { width: 40px; height: 40px; background: rgba(255,255,255,0.06); border: 1.5px solid #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: monospace; font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .hdr-name { font-weight: 600; font-size: 15px; color: #fff; }
+  .hdr-sub { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #7a7a7a; margin-top: 2px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 6px #4ade80; }
+  .bdg { margin-left: auto; font-family: monospace; font-size: 9px; color: #fff; background: rgba(255,255,255,0.08); border: 1px solid #444; padding: 2px 8px; border-radius: 2px; }
+  .msgs { flex: 1; overflow-y: auto; padding: 18px 14px; display: flex; flex-direction: column; gap: 10px; scroll-behavior: smooth; }
+  .msgs::-webkit-scrollbar { width: 3px; }
+  .msgs::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }
+  .rbot { display: flex; gap: 8px; max-width: 88%; align-self: flex-start; }
+  .rusr { display: flex; gap: 8px; max-width: 88%; align-self: flex-end; flex-direction: row-reverse; }
+  .mav { width: 26px; height: 26px; border-radius: 50%; background: rgba(255,255,255,0.06); border: 1px solid #444; display: flex; align-items: center; justify-content: center; font-family: monospace; font-size: 7px; font-weight: 700; color: #fff; flex-shrink: 0; margin-top: 2px; }
+  .bbot { padding: 9px 13px; border-radius: 16px; border-top-left-radius: 4px; font-size: 14px; line-height: 1.55; white-space: pre-wrap; background: #1e1e1e; border: 1px solid #2a2a2a; color: #e8e8f0; }
+  .busr { padding: 9px 13px; border-radius: 16px; border-top-right-radius: 4px; font-size: 14px; line-height: 1.55; white-space: pre-wrap; background: #fff; color: #0f0f0f; font-weight: 500; }
+  .typ { display: flex; align-items: center; gap: 4px; padding: 10px 13px; background: #1e1e1e; border: 1px solid #2a2a2a; border-radius: 16px; border-top-left-radius: 4px; }
+  .typ span { width: 6px; height: 6px; border-radius: 50%; background: #7a7a7a; display: inline-block; animation: bop 1.2s infinite; }
+  .typ span:nth-child(2) { animation-delay: .2s; }
+  .typ span:nth-child(3) { animation-delay: .4s; }
+  @keyframes bop { 0%,60%,100%{transform:translateY(0);opacity:.4} 30%{transform:translateY(-5px);opacity:1} }
+  .qrs { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 14px 10px; flex-shrink: 0; }
+  .qr { background: transparent; border: 1px solid #333; color: #ccc; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: inherit; transition: background .15s; }
+  .qr:hover { background: rgba(255,255,255,0.06); }
+  .inp-a { padding: 10px 14px 14px; background: #1a1a1a; border-top: 1px solid #2a2a2a; display: flex; gap: 10px; align-items: flex-end; flex-shrink: 0; }
+  .inp-a textarea { flex: 1; background: #1e1e1e; border: 1px solid #2a2a2a; border-radius: 12px; color: #e8e8f0; font-family: inherit; font-size: 14px; padding: 9px 13px; resize: none; outline: none; min-height: 40px; max-height: 120px; line-height: 1.4; transition: border-color .15s; }
+  .inp-a textarea:focus { border-color: #555; }
+  .inp-a textarea::placeholder { color: #555; }
+  .sbtn { width: 40px; height: 40px; border-radius: 12px; background: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: opacity .15s; }
+  .sbtn:hover { opacity: .85; }
+  .sbtn:disabled { opacity: .3; cursor: default; }
+  @keyframes up { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+  .an { animation: up .2s ease; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="hdr">
+    <div class="av">CR</div>
+    <div>
+      <div class="hdr-name">Club Rambla</div>
+      <div class="hdr-sub"><div class="dot"></div><span>Atención automática</span></div>
+    </div>
+    <div class="bdg">BOT</div>
+  </div>
+  <div class="msgs" id="msgs"></div>
+  <div class="qrs" id="qrs"></div>
+  <div class="inp-a">
+    <textarea id="inp" placeholder="Escribí tu mensaje..." rows="1"></textarea>
+    <button class="sbtn" id="sbtn" onclick="doSend()">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="#0f0f0f"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
+  </div>
+</div>
+<script>
+const WORKER_URL = 'https://rox-bot.martinfortain.workers.dev';
+ 
+const SYS = `Sos el asistente virtual de Club Rambla, un gimnasio ubicado en Av. 19 N° 481, La Plata. Respondés de forma amigable, breve y directa, como si fueras una persona real del equipo. Usás español rioplatense (vos, tenés, etc). Máximo un emoji por mensaje y solo cuando suma. Sin listas con viñetas. Párrafos cortos y conversacionales.
+ 
+DIRECCIÓN: Av. 19 N° 481, La Plata
+TELÉFONO: 0221 696-0048
+INSTAGRAM: @clubrambla
+ 
+HORARIOS:
+- Lunes a viernes: 6 AM a 12 AM (medianoche)
+- Sábados: 8:00 a 22:00
+- Domingos: 16:00 a 22:00
+ 
+PLANES Y PRECIOS:
+- Plan Básico: $60.000/mes. Incluye acceso total al gimnasio, rutina personalizada y seguimiento por profes.
+- Plan VIP: $70.000/mes. Incluye todo lo del Básico más consulta con nutricionista, 2 estudios corporales Visbody y 10% OFF en viandas saludables.
+ 
+ACTIVIDADES:
+- Musculación
+- Circuito aeróbico
+- Gym localizada
+- Zumba
+- Entrenamiento funcional
+ 
+PROMOS VIGENTES:
+- Beneficio Rambla
+- Plan de referidos
+- Plan familiar
+- Promos bancarias
+- Descuento en efectivo
+(Para conocer los detalles de cada promo, indicales que se acerquen al gym o contacten por Instagram @clubrambla)
+ 
+ENTRENAMIENTO PERSONALIZADO:
+- Sí, ofrecen rutinas personalizadas con sus profes. Para más info invitalos a acercarse al gym.
+ 
+Si alguien pregunta algo que no sabés o quiere más detalles, deciles que contacten por Instagram @clubrambla o que llamen al 0221 696-0048. Nunca inventes información.`;
+ 
+let hist = [], busy = false;
+ 
+const INIT_QRS = ["¿Cuáles son los horarios?","¿Cuánto sale la cuota?","¿Qué planes tienen?","¿Tienen entrenamiento personalizado?"];
+ 
+function addMsg(role, text) {
+  const m = document.getElementById('msgs');
+  const row = document.createElement('div');
+  row.className = (role==='bot'?'rbot':'rusr') + ' an';
+  if (role==='bot') { const a=document.createElement('div');a.className='mav';a.textContent='CR';row.appendChild(a); }
+  const b = document.createElement('div');
+  b.className = role==='bot' ? 'bbot' : 'busr';
+  b.textContent = text;
+  row.appendChild(b);
+  m.appendChild(row);
+  m.scrollTop = m.scrollHeight;
+}
+ 
+function showTyp() {
+  const m = document.getElementById('msgs');
+  const row = document.createElement('div'); row.className='rbot'; row.id='trow';
+  const a = document.createElement('div'); a.className='mav'; a.textContent='CR'; row.appendChild(a);
+  const t = document.createElement('div'); t.className='typ'; t.innerHTML='<span></span><span></span><span></span>'; row.appendChild(t);
+  m.appendChild(row); m.scrollTop=m.scrollHeight;
+}
+ 
+function hideTyp() { const t=document.getElementById('trow'); if(t) t.remove(); }
+ 
+function setQRs(list) {
+  const c = document.getElementById('qrs'); c.innerHTML='';
+  list.forEach(r => { const b=document.createElement('button'); b.className='qr'; b.textContent=r; b.onclick=()=>sendText(r); c.appendChild(b); });
+}
+ 
+async function sendText(text) {
+  if (busy || !text.trim()) return;
+  busy = true;
+  document.getElementById('qrs').innerHTML='';
+  document.getElementById('sbtn').disabled = true;
+  addMsg('user', text);
+  showTyp();
+  hist.push({role:'user', content:text});
+  try {
+    const r = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({model:'claude-sonnet-4-6', max_tokens:1000, system:SYS, messages:hist})
+    });
+    const d = await r.json();
+    const reply = d.content?.[0]?.text || 'No pude procesar tu mensaje, intentá de nuevo.';
+    hist.push({role:'assistant', content:reply});
+    hideTyp();
+    addMsg('bot', reply);
+    if (hist.length <= 4) setQRs(["¿Qué incluye el plan VIP?","¿Tienen promos?","¿Abren los domingos?","¿Cómo me anoto?"]);
+  } catch(e) {
+    hideTyp();
+    addMsg('bot', 'Hubo un error de conexión. Intentá de nuevo.');
+  }
+  busy = false;
+  document.getElementById('sbtn').disabled = false;
+}
+ 
+function doSend() { const i=document.getElementById('inp'); const t=i.value.trim(); i.value=''; i.style.height='auto'; sendText(t); }
+ 
+document.getElementById('inp').addEventListener('input', function() { this.style.height='auto'; this.style.height=Math.min(this.scrollHeight,120)+'px'; });
+document.getElementById('inp').addEventListener('keydown', function(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();doSend();} });
+ 
+async function init() {
+  busy = true; showTyp();
+  await new Promise(r => setTimeout(r, 700));
+  hideTyp();
+  const w = '¡Hola! Soy el asistente de Club Rambla 💪 ¿En qué te puedo ayudar?';
+  addMsg('bot', w);
+  hist = [{role:'assistant', content:w}];
+  setQRs(INIT_QRS);
+  busy = false;
+}
+init();
+</script>
+</body>
+</html>
+ 
